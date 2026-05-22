@@ -16,8 +16,8 @@ export default function Navigation() {
     } catch (_) {}
   }, []);
 
-  const toggleTheme = () => {
-    try {
+  const toggleTheme = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const performToggle = () => {
       const root = document.documentElement;
       const currentTheme = root.classList.contains("dark") ? "dark" : "light";
       const newTheme = currentTheme === "dark" ? "light" : "dark";
@@ -35,9 +35,45 @@ export default function Navigation() {
       }
 
       setTheme(newTheme);
-    } catch (err) {
-      console.error("[Navigation] Failed to toggle theme:", err);
+      return newTheme;
+    };
+
+    if (typeof window === "undefined" || !document.startViewTransition) {
+      performToggle();
+      return;
     }
+
+    const x = e.clientX;
+    const y = e.clientY;
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    const transition = document.startViewTransition(() => {
+      performToggle();
+    });
+
+    transition.ready.then(() => {
+      const isDark = document.documentElement.classList.contains("dark");
+      const clipPath = [
+        `circle(0px at ${x}px ${y}px)`,
+        `circle(${endRadius}px at ${x}px ${y}px)`
+      ];
+
+      document.documentElement.animate(
+        {
+          clipPath: isDark ? clipPath : [...clipPath].reverse(),
+        },
+        {
+          duration: 400,
+          easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+          pseudoElement: isDark
+            ? "::view-transition-new(root)"
+            : "::view-transition-old(root)",
+        }
+      );
+    });
   };
 
   return (

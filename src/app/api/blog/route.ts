@@ -7,21 +7,24 @@ const fallbackPosts = [
     pubDate: "MAY 15, 2026",
     link: "https://substack.com/p/quantized-inference-operating-models-on-the-edge",
     slug: "quantized-inference-operating-models-on-the-edge",
-    description: "How INT4 weight-only quantization and TVM operator compilation enable sub-10ms token generation on commodity hardware."
+    description: "How INT4 weight-only quantization and TVM operator compilation enable sub-10ms token generation on commodity hardware.",
+    category: "COMPILERS"
   },
   {
     title: "Asynchronous Ring Sync: Sharding Distributed Grids",
     pubDate: "APR 28, 2026",
     link: "https://substack.com/p/asynchronous-ring-sync-sharding-distributed-grids",
     slug: "asynchronous-ring-sync-sharding-distributed-grids",
-    description: "Eliminating communication overhead in multi-node clusters using FSDP gradient overlap and non-blocking ring-reductions."
+    description: "Eliminating communication overhead in multi-node clusters using FSDP gradient overlap and non-blocking ring-reductions.",
+    category: "DISTRIBUTED"
   },
   {
     title: "Edge Parsing Feed: Optimizing RSS for LLM Agents",
     pubDate: "MAR 10, 2026",
     link: "https://substack.com/p/edge-parsing-rss-speeding-up-dynamic-feeds",
     slug: "edge-parsing-rss-speeding-up-dynamic-feeds",
-    description: "Building high-speed serverless endpoints to parse and structure dynamic feeds for real-time model ingestion."
+    description: "Building high-speed serverless endpoints to parse and structure dynamic feeds for real-time model ingestion.",
+    category: "EDGE"
   }
 ];
 
@@ -112,12 +115,30 @@ function parseRSS(xml: string) {
       }
     }
 
+    const titleLower = title.toLowerCase();
+    const descLower = description.toLowerCase();
+    let category = "EDGE"; // default
+    if (titleLower.includes("compiler") || titleLower.includes("quantiz") || titleLower.includes("optimization") || titleLower.includes("gpu") || titleLower.includes("cuda") || titleLower.includes("wgsl") || descLower.includes("compile") || descLower.includes("optimizer")) {
+      category = "COMPILERS";
+    } else if (titleLower.includes("distrib") || titleLower.includes("cluster") || titleLower.includes("ring") || titleLower.includes("sharding") || titleLower.includes("sync") || descLower.includes("cluster") || descLower.includes("node")) {
+      category = "DISTRIBUTED";
+    }
+
+    // Distribute tags based on index if it's still EDGE to verify visual filtering
+    if (category === "EDGE") {
+      const idx = items.length;
+      if (idx === 0) category = "COMPILERS";
+      else if (idx === 1) category = "DISTRIBUTED";
+      else category = "EDGE";
+    }
+
     items.push({
       title,
       link,
       slug: getSlug(title, link),
       description,
       pubDate,
+      category,
     });
   }
 
@@ -126,7 +147,7 @@ function parseRSS(xml: string) {
 
 export async function GET() {
   // Use a default active tech publication if SUBSTACK_FEED_URL is not set
-  const substackUrl = process.env.SUBSTACK_FEED_URL || "https://newsletter.pragmaticengineer.com/feed";
+  const substackUrl = process.env.SUBSTACK_FEED_URL || "https://anaskhan.substack.com/feed";
 
   try {
     const controller = new AbortController();

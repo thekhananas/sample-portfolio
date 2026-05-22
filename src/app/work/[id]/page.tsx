@@ -36,7 +36,7 @@ export default async function WorkDetailsPage({ params }: { params: Promise<Work
         <FeatureFlagGate
           flagName="work_case_studies"
           defaultValue={true} // Default to true for client testing
-          skeleton={<WorkDetailSkeleton />}
+          skeleton={<WorkDetailSkeleton id={id} />}
           fallback={<WorkCaseStudiesFallback />}
         >
           <WorkDetailsClient id={id} />

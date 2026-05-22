@@ -30,6 +30,8 @@ if (typeof window !== "undefined") {
 
       remoteConfig.defaultConfig = {
         enable_blog_feed: false,
+        work_case_studies: true,
+        contact_form_active: true,
       };
     }
   } catch (err) {

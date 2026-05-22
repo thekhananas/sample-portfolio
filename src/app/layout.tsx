@@ -16,6 +16,7 @@ import { Suspense } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import RouteProgressBar from "@/components/RouteProgressBar";
+import PerformanceHUD from "@/components/PerformanceHUD";
 
 export const metadata: Metadata = {
   title: "Minimalist Visual Portfolio | Edge-Powered Communications",
@@ -56,6 +57,7 @@ export default function RootLayout({
         <Navigation />
         <main className="flex-grow">{children}</main>
         <Footer />
+        <PerformanceHUD />
       </body>
     </html>
   );
